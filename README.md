@@ -1,4 +1,4 @@
-# RentaSegura 🏠
+# RentaSegura 
 
 Plataforma web de rentas cortas desarrollada como prueba técnica Riwi — ASP.NET C#.  
 Conecta **huéspedes** (exploran y reservan) con **anfitriones** (publican inmuebles y miden su rentabilidad), resolviendo dos brechas del mercado: fricción y fraude en la reserva, y gestión "a ciegas" del propietario.
