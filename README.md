@@ -285,14 +285,3 @@ Expuestos en `/health` como JSON con el estado de dos componentes: la base de da
 | Stub de KYC detrás de interfaz | Implementación directa | Cambiar de proveedor de IA en producción no toca el flujo |
 | ASP.NET Core Identity + cookies | JWT | El flujo MVC server-rendered funciona naturalmente con cookies; no hay cliente SPA |
 | Rate limiting a nivel de middleware | Validar en controladores | El middleware corta el request antes de llegar a la BD, más eficiente |
-
----
-
-## Notas para producción
-
-- Cambiar `DocumentVault:MasterKey` por una clave aleatoria de 32+ caracteres.
-- Cambiar credenciales de PostgreSQL (`POSTGRES_PASSWORD`) por valores seguros.
-- Configurar `Smtp` con un proveedor real: Gmail con App Password (`Host=smtp.gmail.com`, `Port=587`, `UseSsl=true`), SendGrid o AWS SES.
-- Reemplazar `StubIdentityVerificationService` por Azure AI Document Intelligence o AWS Textract (una línea en `Program.cs`).
-- Migrar de `EnsureCreated` a `dotnet ef migrations add Inicial` para poder evolucionar el esquema sin borrar datos.
-- El constraint `ck_no_double_booking` se crea con SQL idempotente en `DbInitializer`; en producción con migraciones pasaría a la migración inicial.
