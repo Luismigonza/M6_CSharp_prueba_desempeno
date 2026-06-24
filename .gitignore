@@ -1,0 +1,13 @@
+## .NET
+bin/
+obj/
+*.user
+.vs/
+.idea/
+
+## Build / publish
+[Pp]ublish/
+artifacts/
+
+## Datos locales / secretos
+*.env

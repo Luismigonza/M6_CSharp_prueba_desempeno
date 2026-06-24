@@ -1,0 +1,86 @@
+@model PropertyDetailsViewModel
+@{
+    ViewData["Title"] = Model.Property.Title;
+    var p = Model.Property;
+    var isAuth = User.Identity?.IsAuthenticated == true;
+    var isOwner = User.IsInRole(Roles.Anfitrion);
+    var returnUrl = $"/Home/Details/{p.Id}";
+}
+
+<a asp-action="Index" class="btn btn-link ps-0"><i class="bi bi-arrow-left"></i> Volver al catálogo</a>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-warning">@Model.Message</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <img src="@(p.ImageUrl ?? "https://via.placeholder.com/800x500?text=Inmueble")"
+             class="img-fluid rounded-3 shadow-sm w-100" style="max-height:420px;object-fit:cover;" alt="@p.Title" />
+        <h1 class="h3 mt-3">@p.Title</h1>
+        <p class="text-muted"><i class="bi bi-geo-alt"></i> @p.Address, @p.City</p>
+        <div class="d-flex gap-3 text-muted mb-3">
+            <span><i class="bi bi-door-closed"></i> @p.Bedrooms habitaciones</span>
+            <span><i class="bi bi-people"></i> Hasta @p.Capacity huéspedes</span>
+        </div>
+        <p>@p.Description</p>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 sticky-top" style="top:90px;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="h4 mb-0 text-success">@p.PricePerNight.ToString("C0")</span>
+                    <span class="text-muted">/ noche</span>
+                </div>
+
+                <div class="alert alert-light border small mb-3">
+                    <i class="bi bi-clock"></i> Horario estándar: <strong>check-in 2:00 PM</strong>, <strong>check-out 12:00 PM</strong>.
+                </div>
+
+                @if (isOwner)
+                {
+                    <div class="alert alert-info small mb-0">Estás navegando como anfitrión; las reservas son para huéspedes.</div>
+                }
+                else
+                {
+                    <form asp-controller="Reservations" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="propertyId" value="@p.Id" />
+                        <div class="mb-2">
+                            <label class="form-label small">Llegada</label>
+                            <input name="checkIn" type="date" required class="form-control"
+                                   value="@(Model.CheckIn?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Salida</label>
+                            <input name="checkOut" type="date" required class="form-control"
+                                   value="@(Model.CheckOut?.ToString("yyyy-MM-dd"))" />
+                        </div>
+
+                        @if (!isAuth)
+                        {
+                            <a class="btn btn-warning w-100"
+                               asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
+                                Inicia sesión para reservar
+                            </a>
+                            <p class="text-center text-muted small mt-2 mb-0">Explorar es libre; reservar requiere cuenta.</p>
+                        }
+                        else if (!Model.UserHasApprovedKyc)
+                        {
+                            <a class="btn btn-outline-primary w-100" asp-controller="Kyc" asp-action="Index">
+                                <i class="bi bi-person-badge"></i> Validar identidad para reservar
+                            </a>
+                            <p class="text-center text-muted small mt-2 mb-0">Requerido antes de tu primera reserva.</p>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-success w-100"><i class="bi bi-calendar-check"></i> Reservar</button>
+                        }
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,66 @@
+@model RentaSegura.Web.Domain.KycVerification
+@{
+    ViewData["Title"] = "Validación de identidad";
+    var approved = Model?.Status == KycStatus.Approved;
+    var rejected = Model?.Status == KycStatus.Rejected;
+}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h1 class="h4 mb-3"><i class="bi bi-person-badge"></i> Validación de identidad (KYC)</h1>
+
+        @if (approved)
+        {
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle-fill"></i> <strong>Identidad verificada.</strong> Ya puedes reservar.
+            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">Datos extraídos por la IA</h6>
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Nombres</dt><dd class="col-7">@Model!.FirstName</dd>
+                        <dt class="col-5">Apellidos</dt><dd class="col-7">@Model.LastName</dd>
+                        <dt class="col-5">Documento</dt><dd class="col-7">@Model.DocumentNumber</dd>
+                        <dt class="col-5">Fecha de nacimiento</dt><dd class="col-7">@(Model.BirthDate?.ToString("dd/MM/yyyy"))</dd>
+                    </dl>
+                    <hr />
+                    <p class="small text-muted mb-0">
+                        <i class="bi bi-shield-lock"></i> Tu documento fue cifrado, procesado y
+                        <strong>eliminado de forma segura</strong> el
+                        @(Model.DocumentSecurelyDeletedAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")).
+                        No conservamos la imagen.
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            @if (rejected)
+            {
+                <div class="alert alert-danger">
+                    <i class="bi bi-x-circle-fill"></i> <strong>Validación rechazada.</strong> @Model!.RejectionReason
+                </div>
+            }
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p>Sube una foto clara de tu documento de identidad (cédula). El sistema extraerá tus datos automáticamente con IA y emitirá un veredicto.</p>
+
+                    <div class="alert alert-light border small">
+                        <i class="bi bi-shield-lock"></i> <strong>Privacidad:</strong> tu documento se cifra (AES-GCM),
+                        se procesa para extraer los datos y se <strong>elimina de forma segura</strong>. No guardamos la imagen.
+                    </div>
+
+                    <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label">Documento de identidad</label>
+                            <input type="file" name="document" accept="image/*" capture="environment" required class="form-control" />
+                            <div class="form-text">Desde el móvil puedes tomar la foto directamente.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i> Validar identidad</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

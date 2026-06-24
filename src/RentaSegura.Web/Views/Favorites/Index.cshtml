@@ -1,0 +1,36 @@
+@model List<RentaSegura.Web.Domain.Property>
+@{
+    ViewData["Title"] = "Mis favoritos";
+}
+<h1 class="h4 mb-3"><i class="bi bi-heart-fill text-danger"></i> Mis favoritos</h1>
+
+@if (Model.Count == 0)
+{
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-heart display-4"></i>
+        <p class="mt-2">Aún no has guardado inmuebles. Explora el catálogo y marca tus favoritos.</p>
+        <a class="btn btn-warning" asp-controller="Home" asp-action="Index">Explorar</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var p in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="@(p.ImageUrl ?? "https://via.placeholder.com/800x500?text=Inmueble")"
+                         class="card-img-top" style="height:180px;object-fit:cover;" alt="@p.Title" />
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">@p.Title</h5>
+                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> @p.City</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">@p.PricePerNight.ToString("C0")</span>
+                            <a class="btn btn-sm btn-outline-dark" asp-controller="Home" asp-action="Details" asp-route-id="@p.Id">Ver y reservar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

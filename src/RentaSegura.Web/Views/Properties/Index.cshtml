@@ -1,0 +1,56 @@
+@model List<RentaSegura.Web.Domain.Property>
+@{
+    ViewData["Title"] = "Mis inmuebles";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0"><i class="bi bi-houses"></i> Mis inmuebles</h1>
+    <a class="btn btn-warning" asp-action="Create"><i class="bi bi-plus-lg"></i> Publicar inmueble</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-house-add display-4"></i>
+        <p class="mt-2">Aún no has publicado inmuebles.</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Inmueble</th><th>Ciudad</th><th>Tarifa/noche</th><th>Estado</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="@(p.ImageUrl ?? "https://via.placeholder.com/80")" style="width:48px;height:48px;object-fit:cover;border-radius:8px;" />
+                                <span class="fw-semibold">@p.Title</span>
+                            </div>
+                        </td>
+                        <td>@p.City</td>
+                        <td>@p.PricePerNight.ToString("C0")</td>
+                        <td>
+                            @if (p.IsPublished)
+                            {
+                                <span class="badge bg-success">Publicado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Oculto</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-dark" asp-action="Edit" asp-route-id="@p.Id"><i class="bi bi-pencil"></i> Editar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

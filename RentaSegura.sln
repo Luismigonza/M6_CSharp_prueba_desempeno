@@ -1,0 +1,27 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RentaSegura.Web", "src\RentaSegura.Web\RentaSegura.Web.csproj", "{EAC928F6-C957-4F19-A74C-AD173E8C0ECC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RentaSegura.UnitTests", "tests\RentaSegura.UnitTests\RentaSegura.UnitTests.csproj", "{EAD65CFA-A8B2-47A6-B8B5-D086D14A81D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAC928F6-C957-4F19-A74C-AD173E8C0ECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC928F6-C957-4F19-A74C-AD173E8C0ECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC928F6-C957-4F19-A74C-AD173E8C0ECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC928F6-C957-4F19-A74C-AD173E8C0ECC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAD65CFA-A8B2-47A6-B8B5-D086D14A81D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD65CFA-A8B2-47A6-B8B5-D086D14A81D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD65CFA-A8B2-47A6-B8B5-D086D14A81D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD65CFA-A8B2-47A6-B8B5-D086D14A81D3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

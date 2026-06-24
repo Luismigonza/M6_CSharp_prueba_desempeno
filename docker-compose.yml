@@ -1,0 +1,59 @@
+# ============================================================================
+#  docker-compose.yml  —  Levanta TODO el entorno con un solo comando:
+#    docker compose up --build
+#
+#  Servicios:
+#    - db      : PostgreSQL 16
+#    - app     : la aplicación ASP.NET Core 9 (RentaSegura)
+#
+#  Nota: MailHog fue removido. Los correos van directo a Gmail via SMTP real.
+#  Para volver a MailHog: cambiar Smtp__Host a "mailhog" y Smtp__Port a "1025"
+#  y descomentar el servicio mailhog de abajo.
+# ============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: rentasegura
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rentasegura"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # mailhog:
+  #   image: mailhog/mailhog
+  #   ports:
+  #     - "1025:1025"
+  #     - "8025:8025"
+
+  app:
+    build:
+      context: .
+      dockerfile: src/RentaSegura.Web/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=rentasegura;Username=postgres;Password=postgres"
+      Smtp__Host: "smtp.gmail.com"
+      Smtp__Port: "587"
+      Smtp__UseSsl: "true"
+      Smtp__User: "luismigonzalez38@gmail.com"
+      Smtp__Password: "jbzfkswmphurziad"
+      Smtp__FromAddress: "luismigonzalez38@gmail.com"
+      DocumentVault__MasterKey: "clave-maestra-demo-cambiar-en-produccion-32+chars"
+      DocumentVault__StoragePath: "/app/vault"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

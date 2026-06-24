@@ -1,0 +1,154 @@
+@model List<RentaSegura.Web.Domain.Reservation>
+@{
+    ViewData["Title"] = "Mis reservas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h5 fw-bold mb-0"><i class="bi bi-calendar-check me-2 text-warning"></i>Mis reservas</h1>
+    <a class="btn btn-sm btn-warning" asp-controller="Home" asp-action="Index">
+        <i class="bi bi-plus-lg me-1"></i>Nueva reserva
+    </a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <h5 class="fw-semibold">Aún no tienes reservas</h5>
+            <p class="text-muted small">Explora el catálogo y encuentra tu próxima estancia.</p>
+            <a class="btn btn-warning mt-1" asp-controller="Home" asp-action="Index">Explorar inmuebles</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var r in Model)
+        {
+            var (canCancel, cantReason) = r.CanCancel();
+            var isCancelled  = r.Status == RentaSegura.Web.Domain.ReservationStatus.Cancelled;
+            var isCompleted  = r.Status == RentaSegura.Web.Domain.ReservationStatus.Completed;
+            var statusClass  = isCancelled ? "cancelled" : "";
+            var badgeBg      = isCancelled ? "bg-secondary" : isCompleted ? "bg-info text-dark" : "bg-success";
+            var statusLabel  = isCancelled ? "Cancelada" : isCompleted ? "Completada" : "Confirmada";
+
+            <div class="card reservation-card @statusClass">
+                <div class="card-body">
+                    <div class="row g-3 align-items-start">
+
+                        <!-- Imagen + título -->
+                        <div class="col-auto d-none d-md-block">
+                            <img src="@(r.Property?.ImageUrl ?? "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200")"
+                                 style="width:80px;height:80px;object-fit:cover;border-radius:12px;" alt="" />
+                        </div>
+
+                        <div class="col">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                <div>
+                                    <span class="badge @badgeBg mb-1">@statusLabel</span>
+                                    <h6 class="fw-bold mb-0">@r.Property?.Title</h6>
+                                    <p class="text-muted mb-0" style="font-size:.8rem;">
+                                        <i class="bi bi-geo-alt-fill me-1" style="color:var(--rs-amber);"></i>@r.Property?.City
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold" style="color:#059669;font-size:1.1rem;">
+                                        @r.PricePaid.ToString("C0")
+                                    </div>
+                                    <div class="text-muted" style="font-size:.75rem;">@r.Nights noche(s)</div>
+                                </div>
+                            </div>
+
+                            <!-- Fechas -->
+                            <div class="row g-2 mt-2">
+                                <div class="col-sm-6">
+                                    <div class="p-2 rounded" style="background:#f0fdf4;font-size:.8rem;">
+                                        <i class="bi bi-box-arrow-in-right text-success me-1"></i>
+                                        <strong>Llegada</strong><br />
+                                        @r.CheckInDate.ToString("dd 'de' MMMM yyyy", new System.Globalization.CultureInfo("es-CO"))
+                                        · <span class="fw-semibold">2:00 PM</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-2 rounded" style="background:#fff1f2;font-size:.8rem;">
+                                        <i class="bi bi-box-arrow-right text-danger me-1"></i>
+                                        <strong>Salida</strong><br />
+                                        @r.CheckOutDate.ToString("dd 'de' MMMM yyyy", new System.Globalization.CultureInfo("es-CO"))
+                                        · <span class="fw-semibold">12:00 PM</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Acciones -->
+                            <div class="d-flex gap-2 mt-3 flex-wrap">
+                                <a class="btn btn-sm btn-outline-dark"
+                                   asp-controller="Home" asp-action="Details"
+                                   asp-route-id="@r.PropertyId">
+                                    <i class="bi bi-eye me-1"></i>Ver inmueble
+                                </a>
+
+                                @if (canCancel)
+                                {
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#cancelModal"
+                                            data-id="@r.Id"
+                                            data-title="@r.Property?.Title"
+                                            data-date="@r.CheckInDate.ToString("dd/MM/yyyy")">
+                                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                                    </button>
+                                }
+                                else if (!isCancelled && !isCompleted)
+                                {
+                                    <span class="text-muted small align-self-center" style="font-size:.75rem;">
+                                        <i class="bi bi-lock me-1"></i>@cantReason
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Modal cancelación -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius:var(--rs-radius);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Cancelar reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3">
+                    Estás a punto de cancelar tu reserva en <strong id="cancelTitle"></strong>
+                    con llegada el <strong id="cancelDate"></strong>.
+                </p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-clock me-1"></i>
+                    Solo puedes cancelar con al menos <strong>48 horas</strong> de antelación al check-in.
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Volver</button>
+                <form id="cancelForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Sí, cancelar reserva</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('cancelModal')?.addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        document.getElementById('cancelTitle').textContent = btn.dataset.title;
+        document.getElementById('cancelDate').textContent  = btn.dataset.date;
+        document.getElementById('cancelForm').action = '/Reservations/Cancel/' + btn.dataset.id;
+    });
+</script>
+}

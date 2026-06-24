@@ -1,0 +1,158 @@
+@inject RentaSegura.Web.Infrastructure.AppDbContext Db
+@{
+    var userId  = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isAuth  = User.Identity?.IsAuthenticated == true;
+    var isOwner = User.IsInRole(Roles.Anfitrion);
+
+    List<RentaSegura.Web.Domain.Notification> notifications = new();
+    int unread = 0;
+    if (isAuth && userId is not null)
+    {
+        notifications = await Db.Notifications
+            .Where(n => n.RecipientUserId == userId)
+            .OrderByDescending(n => n.CreatedAtUtc)
+            .Take(10)
+            .ToListAsync();
+        unread = notifications.Count(n => !n.IsRead);
+    }
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RentaSegura</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background:#1f2937;">
+    <div class="container">
+        <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-house-heart-fill text-warning"></i> RentaSegura
+        </a>
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Explorar</a></li>
+                @if (isAuth && !isOwner)
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Favorites"    asp-action="Index">Favoritos</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Reservations" asp-action="Index">Mis reservas</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Kyc"          asp-action="Index">Mi identidad</a></li>
+                }
+                @if (isOwner)
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Properties" asp-action="Index">Mis inmuebles</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Dashboard"  asp-action="Index">Dashboard</a></li>
+                }
+            </ul>
+
+            <ul class="navbar-nav">
+                @if (isAuth)
+                {
+                    <!-- Campana de notificaciones -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link position-relative" href="#" id="bellBtn"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell-fill"></i>
+                            @if (unread > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notifBadge">
+                                    @unread
+                                </span>
+                            }
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" style="width:330px;max-height:420px;overflow-y:auto;">
+                            <li class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                <h6 class="mb-0">Notificaciones</h6>
+                                @if (unread > 0)
+                                {
+                                    <button class="btn btn-link btn-sm p-0 text-muted" id="markAllRead">
+                                        Marcar todas leídas
+                                    </button>
+                                }
+                            </li>
+                            @if (notifications.Count == 0)
+                            {
+                                <li><span class="dropdown-item-text text-muted small py-3 d-block text-center">Sin notificaciones</span></li>
+                            }
+                            @foreach (var n in notifications)
+                            {
+                                <li class="px-3 py-2 border-bottom @(n.IsRead ? "opacity-60" : "")">
+                                    <div class="fw-semibold small">
+                                        @if (!n.IsRead) { <span class="badge bg-primary me-1" style="font-size:.55rem;">nuevo</span> }
+                                        @n.Title
+                                    </div>
+                                    <div class="small text-muted">@n.Body</div>
+                                    <div class="text-muted" style="font-size:.7rem;">@n.CreatedAtUtc.ToLocalTime().ToString("dd/MM HH:mm")</div>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+
+                    <!-- Menú de usuario -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> @User.Identity?.Name
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                <i class="bi bi-gear"></i> Mi perfil
+                            </a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Iniciar sesión</a></li>
+                    <li class="nav-item">
+                        <a class="btn btn-warning btn-sm mt-1 ms-2 fw-semibold"
+                           asp-controller="Account" asp-action="Register">Registrarse</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    @if (TempData["Success"] is string ok)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill"></i> @ok
+            <button class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] is string err)
+    {
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill"></i> @err
+            <button class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @RenderBody()
+</main>
+
+<footer class="text-center text-muted py-4 small border-top">
+    RentaSegura · Plataforma de rentas cortas
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

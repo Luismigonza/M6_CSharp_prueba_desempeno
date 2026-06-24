@@ -1,0 +1,200 @@
+/* ============================================================
+   RentaSegura — diseño moderno, limpio, sin ruido visual
+   Paleta: gris carbón #1f2937 · ámbar #f59e0b · blanco roto
+   ============================================================ */
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+    --rs-dark:    #1f2937;
+    --rs-amber:   #f59e0b;
+    --rs-amber-h: #d97706;
+    --rs-surface: #ffffff;
+    --rs-bg:      #f3f4f6;
+    --rs-muted:   #6b7280;
+    --rs-border:  #e5e7eb;
+    --rs-radius:  16px;
+    --rs-radius-sm: 10px;
+    --rs-shadow:  0 2px 12px rgba(0,0,0,.06);
+    --rs-shadow-h:0 8px 28px rgba(0,0,0,.10);
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+body {
+    background: var(--rs-bg);
+    color: var(--rs-dark);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Navbar ─────────────────────────────────────────────────── */
+.navbar {
+    background: var(--rs-dark) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,.06);
+    padding-top: .9rem;
+    padding-bottom: .9rem;
+}
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -.2px;
+}
+.navbar .nav-link {
+    font-size: .88rem;
+    font-weight: 500;
+    opacity: .82;
+    transition: opacity .15s;
+    padding-left: .75rem;
+    padding-right: .75rem;
+}
+.navbar .nav-link:hover { opacity: 1; }
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.card {
+    border: 1px solid var(--rs-border) !important;
+    border-radius: var(--rs-radius) !important;
+    background: var(--rs-surface);
+    box-shadow: var(--rs-shadow);
+    transition: transform .18s ease, box-shadow .18s ease;
+    overflow: hidden;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--rs-shadow-h);
+}
+.card-body { padding: 1.25rem; }
+
+/* ── Tarjetas del catálogo ──────────────────────────────────── */
+.prop-card .card-img-top {
+    height: 210px;
+    object-fit: cover;
+    transition: transform .3s ease;
+}
+.prop-card:hover .card-img-top { transform: scale(1.03); }
+.prop-card .img-wrap { overflow: hidden; }
+
+/* ── Botón favorito ─────────────────────────────────────────── */
+.btn-fav {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+    background: rgba(255,255,255,.88);
+    border: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,.15);
+    transition: transform .15s, background .15s;
+}
+.btn-fav:hover { transform: scale(1.12); background: #fff; }
+
+/* ── Botones ─────────────────────────────────────────────────── */
+.btn { border-radius: var(--rs-radius-sm); font-weight: 500; }
+.btn-warning  { background: var(--rs-amber);   border-color: var(--rs-amber);   color: #fff; }
+.btn-warning:hover { background: var(--rs-amber-h); border-color: var(--rs-amber-h); color: #fff; }
+
+/* ── Hero / banner de búsqueda ──────────────────────────────── */
+.hero-search {
+    background: linear-gradient(135deg, var(--rs-dark) 0%, #374151 100%);
+    border-radius: var(--rs-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.hero-search .form-control {
+    border-radius: var(--rs-radius-sm);
+    border: none;
+    box-shadow: none;
+    padding: .6rem 1rem;
+    font-size: .9rem;
+}
+.hero-search .form-control:focus { box-shadow: 0 0 0 3px rgba(245,158,11,.35); }
+
+/* ── Filtro ciudad (pill) ───────────────────────────────────── */
+.search-pill {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: .3rem .5rem .3rem 1rem;
+    gap: .5rem;
+}
+.search-pill input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: .9rem;
+    width: 200px;
+}
+.search-pill input::placeholder { color: rgba(255,255,255,.5); }
+.search-pill .btn-search {
+    border-radius: 999px;
+    padding: .35rem .9rem;
+    font-size: .85rem;
+    background: var(--rs-amber);
+    color: #fff;
+    border: none;
+}
+.search-pill .btn-clear {
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.15);
+    border: none;
+    color: rgba(255,255,255,.7);
+    font-size: .75rem;
+    transition: background .15s;
+}
+.search-pill .btn-clear:hover { background: rgba(255,255,255,.25); color: #fff; }
+
+/* ── Badges de estado ───────────────────────────────────────── */
+.badge { border-radius: 999px; font-weight: 500; font-size: .72rem; padding: .3em .7em; }
+
+/* ── Precio ─────────────────────────────────────────────────── */
+.price-tag { font-size: 1.05rem; font-weight: 700; color: #059669; }
+.price-tag small { font-size: .75rem; font-weight: 400; color: var(--rs-muted); }
+
+/* ── Sección de reservas ────────────────────────────────────── */
+.reservation-card {
+    border-left: 3px solid var(--rs-amber) !important;
+}
+.reservation-card.cancelled {
+    border-left-color: var(--rs-border) !important;
+    opacity: .75;
+}
+
+/* ── Formularios ────────────────────────────────────────────── */
+.form-control, .form-select {
+    border-radius: var(--rs-radius-sm);
+    border-color: var(--rs-border);
+    font-size: .9rem;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--rs-amber);
+    box-shadow: 0 0 0 3px rgba(245,158,11,.2);
+}
+.form-label { font-size: .85rem; font-weight: 500; color: var(--rs-dark); margin-bottom: .35rem; }
+
+/* ── Auth cards ─────────────────────────────────────────────── */
+.auth-card {
+    max-width: 440px;
+    margin: 2rem auto;
+}
+.auth-card .card-body { padding: 2rem; }
+
+/* ── Alertas ─────────────────────────────────────────────────── */
+.alert { border-radius: var(--rs-radius-sm); border: none; font-size: .88rem; }
+.alert-success { background: #d1fae5; color: #065f46; }
+.alert-danger  { background: #fee2e2; color: #991b1b; }
+.alert-warning { background: #fef3c7; color: #92400e; }
+.alert-light   { background: #f9fafb; color: var(--rs-dark); border: 1px solid var(--rs-border) !important; }
+
+/* ── KPIs del dashboard ─────────────────────────────────────── */
+.kpi-card .kpi-value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+.kpi-card .kpi-label { font-size: .78rem; color: var(--rs-muted); margin-top: .25rem; }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer { border-top: 1px solid var(--rs-border) !important; }
+
+/* ── Transiciones generales ─────────────────────────────────── */
+a { transition: color .15s; }
